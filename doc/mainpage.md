@@ -60,6 +60,11 @@ The first approach offers the greatest flexibility for custom protocols or
 for modeling outside of %IMP itself, but does require everything to be done
 manually. For a good example of this approach, see the
 [modeling of Nup133](https://github.com/integrativemodeling/nup133/tree/master/outputs_foxs_ensemble_new/pdb-dev).
+(One example of the tradeoff between flexibility and manual coding:
+the crosslinks used in the study are stored in a
+[plain text file](https://github.com/integrativemodeling/nup133/blob/master/Crosslinks/DSS_EDC_crosslinks.txt)
+so a [custom Python class](https://github.com/integrativemodeling/nup133/blob/master/outputs_foxs_ensemble_new/pdb-dev/xlink.py)
+had to be written to parse them.)
 
 The second approach will be explored in this tutorial.
 
