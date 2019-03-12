@@ -70,6 +70,89 @@ The second approach will be explored in this tutorial.
 
 # Basic usage of ProtocolOutput {#basicusage}
 
+[ProtocolOutput](@ref IMP::pmi::mmcif::ProtocolOutput) is designed to be
+attached to a top-level PMI object (usually IMP::pmi::topology::System).
+Then, as the
+script is run, it will capture all of the information about the modeling
+study, in an [ihm.System object](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System).
+Additional information not in the modeling script itself, such as the
+resulting publication, can be added using the
+[python-ihm API](https://python-ihm.readthedocs.io/en/latest/usage.html).
+
+First, we need to import the PMI and python-ihm Python modules:
+
+\code{.py}
+import IMP.pmi.mmcif
+import ihm
+\endcode
+
+Next, as soon as the top-level IMP::pmi::topology::System object is created,
+we attach a ProtocolOutput object:
+
+\code{.py}
+bs = IMP.pmi.macros.BuildSystem(m)
+
+if '--mmcif' in sys.argv:
+    # Record the modeling protocol to an mmCIF file
+    po = IMP.pmi.mmcif.ProtocolOutput(open('rnapii.cif', 'w'))
+    bs.system.add_protocol_output(po)
+    po.system.title = "Modeling of RNA Pol II"
+    # Add publication
+    po.system.citations.append(ihm.Citation.from_pubmed_id(25161197))
+\endcode
+
+Note that we only do this if the script is run with the `--mmcif` option.
+Note also that the ProtocolOutput object `po` simply wraps an `ihm.System`
+object as `po.system`. We can then customize the `ihm.System` by setting a
+human-readable title and adding a citation (here we use
+[ihm.Citation.from\_pubmed\_id](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.Citation.from_pubmed_id),
+which looks up a citation by PubMed ID - this particular PubMed ID is
+actually for the previously-published
+[modeling of the Nup84 complex](https://salilab.org/nup84/)).
+
+At the end of the modeling, we then simply write the entire study out to the
+mmCIF file by using ProtocolOutput's `flush` method:
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    po.flush()
+\endcode
+
+As it is generally undesirable to rerun the entire modeling just to generate
+an mmCIF file, we can save a lot of time by adding a 'dry run' option to the
+script which skips the actual Monte Carlo simulation:
+
+\code{.py}
+bs.dry_run = '--dry-run' in sys.argv
+...
+c1=IMP.pmi.macros.ReplicaExchange0(m, ..., test_mode=bs.dry_run)
+\endcode
+
+Finally, we can run the script with the `--mmcif` and `--dry-run` options
+to get the mmCIF output `rnapii.cif`:
+
+\code{.sh}
+python modeling.py --mmcif --dry-run
+\endcode
+
+The `rnapii.cif` file can be viewed in a text editor, or the `po.system`
+object can be explored in a Python console. Each contains a great
+deal of information about the system, including:
+
+ - the software (%IMP and PMI) used in the modeling (in the `_software` table
+   in the mmCIF file, or as [po.system.software](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.software) in Python).
+ - cited papers (`_citation` table or [po.system.citations](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.citations) Python object).
+ - the entities (unique polymer sequences) that make up the system
+   (`_entity`, `_entity_poly`, `_entity_poly_seq` tables or [po.system.entities](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.entities)).
+ - each asymmetric unit (instance of an entity) (`_struct_asym` table or [po.system.asym\_units](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.asym_units)).
+ - assemblies (collections of entities and/or asymmetric units that represent
+   a subset of the system, such as everything modeled in a given state, or
+   everything that fits into an electron microscopy density map) (`_ihm_struct_assembly` table or [po.system.complete\_assembly](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.complete_assembly)).
+ - input experimental information, such as crystal structures, comparative
+   models, or cross-links (`_ihm_dataset_list` table or [ihm.dataset objects](https://python-ihm.readthedocs.io/en/latest/dataset.html)).
+ - information about each restraint, such as cross-linking (`_ihm_cross_link_list` table or [ihm.restraint.CrossLinkRestraint objects](https://python-ihm.readthedocs.io/en/latest/restraint.html#ihm.restraint.CrossLinkRestraint)).
+ - the Monte Carlo simulation (`_ihm_modeling_protocol` table or [ihm.protocol objects](https://python-ihm.readthedocs.io/en/latest/protocol.html)).
+
 # Linking to other data {#linking}
 
 # Annotation of input files {#annotation}
