@@ -181,6 +181,17 @@ files. In addition, the Python script itself is linked from the mmCIF file.
 Such local paths won't be available to end users, so for deposition we need
 to replace these paths with database IDs or DOIs ([see below](@ref polishing)).
 
+As a further example of linkage, see the links in the previously-published
+[modeling of the Nup84 complex](https://salilab.org/nup84/) below. The mmCIF
+file links to the data directly used in the modeling (cross-links, crystal
+structures, electron microscopy class averages, comparative models, and
+Python scripts) via database IDs or DOIs. Furthermore, where available links
+are provided from this often-processed data back to the original data, such
+as templates for comparative models, mass spectometry spectra for cross-links,
+or micrographs for class averages:
+
+\image html links.png width=700px
+
 # Annotation of input files {#annotation}
 
 ProtocolOutput will look at all input files to try to extract as much metadata
