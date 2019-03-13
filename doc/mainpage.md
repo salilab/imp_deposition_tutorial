@@ -155,6 +155,32 @@ deal of information about the system, including:
 
 # Linking to other data {#linking}
 
+Integrative modeling draws on data from a variety of sources, so for a
+complete deposition all of this data needs to be available. The data is not
+placed directly in the mmCIF file - rather, the file contains links. These
+links can be:
+
+ - an identifier in a domain-specific database, such as
+   [PDB](https://www.wwpdb.org/) or [EMDB](https://www.ebi.ac.uk/pdbe/emdb/).
+ - a [DOI](https://www.doi.org/) where the files can be obtained.
+ - a path to a file on the local disk.
+
+Database identifiers are preferable because the databases are curated by
+domain experts and include domain-specific information, and the files are
+in standard formats. ProtocolOutput will attempt to use these where possible.
+For example, in this case ProtocolOutput is able to read the annotations of
+the input crystal structure used for the modeling ([see below](@ref annotation))
+and determine that it is stored in the PDB, so the relevant
+[1WCM](https://www.rcsb.org/structure/1WCM) identitifer is included in the
+mmCIF file (see the `_ihm_dataset_related_db_reference` table).
+
+When a file is used for the modeling which cannot be tracked back to a database,
+ProtocolOutput will include its path (relative to that of the mmCIF file).
+For example, in this case the cross-links used are stored in simple CSV
+files. In addition, the Python script itself is linked from the mmCIF file.
+Such local paths won't be available to end users, so for deposition we need
+to replace these paths with database IDs or DOIs ([see below](@ref polishing)).
+
 # Annotation of input files {#annotation}
 
 # Polishing the deposition {#polishing}
