@@ -213,4 +213,135 @@ files are annotated as well as possible:
 
 # Polishing the deposition {#polishing}
 
+ProtocolOutput attempts to automatically generate as much as possible of the
+mmCIF file, but there are some areas where manual intervention is necessary
+because the data is missing, or its guess was incomplete. This data can be
+corrected by manipulating the [ihm.System object](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System)
+directly, at the script, immediately before we call ProtocolOutput's `flush`
+method. We will look at a few examples in this section.
+
+## Cross-linker type {#xltype}
+
+For cross-linking experiments, the mmCIF file contains a description of the
+cross-linking reagent used. This information is not in the CSV file or the
+Python script. ProtocolOutput guesses the name of the reagent using the
+`label` passed to the PMI [CrossLinkingMassSpectrometryRestraint](@ref IMP::pmi::restraints::crosslinking::CrossLinkingMassSpectrometryRestraint),
+as this label is often the name of the cross-linker. However, in this case it
+is not (we used the labels `Trnka` and `Chen` respectively for the datasets
+from [Al Burlingame's lab](http://www.mcponline.org/content/13/2/420.long) and
+[Juri Rappsilber's lab](http://emboj.embopress.org/content/29/4/717)).
+We can correct this by looking up the publications to determine
+that the [DSS](https://en.wikipedia.org/wiki/Disuccinimidyl_suberate)
+and [BS3](https://en.wikipedia.org/wiki/Bissulfosuccinimidyl_suberate)
+cross-linkers were used, respectively, and using the python-ihm
+API to set the correct
+[cross-linker type](https://python-ihm.readthedocs.io/en/latest/cross_linkers.html)
+for each [cross-linking restraint](https://python-ihm.readthedocs.io/en/latest/restraint.html#ihm.restraint.CrossLinkRestraint)
+in the [list of all restraints](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.restraints):
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    import ihm.cross_linkers
+    trnka, chen = [r for r in po.system.restraints if hasattr(r, 'linker')]
+    trnka.linker = ihm.cross_linkers.dss
+    chen.linker = ihm.cross_linkers.bs3
+\endcode
+
+## Add model coordinates {#addcoords}
+
+The current mmCIF file contains all of the input data, and notes that Monte
+Carlo was used to generate 100 frames, but doesn't actually store any of those
+coordinates in the file. Ultimately this information will be added automatically
+by PMI model analysis and validation scripts, but for the time being any
+information about clustering, localization densities, and final models needs
+to be added to the file using the python-ihm API:
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    # Get last protocol in the file
+    protocol = po.system.orphan_protocols[-1]
+    # State that we filtered the 100 frames down to one cluster of 10 models:
+    analysis = ihm.analysis.Analysis()
+    protocol.analyses.append(analysis)
+    analysis.steps.append(ihm.analysis.ClusterStep(
+                            feature='RMSD', num_models_begin=100,
+                            num_models_end=10))
+    # Create an ensemble for the cluster (warning: _add_simple_ensemble
+    # is subject to change in future IMP releases) and deposit a single
+    # model (let's say it's frame 42 from the output RMF file)
+    e = po._add_simple_ensemble(analysis.steps[-1],
+                                name="Cluster 0", num_models=10,
+                                drmsd=12.2, num_models_deposited=1,
+                                localization_densities={}, ensemble_file=None)
+    # Add the model from RMF
+    rh = RMF.open_rmf_file_read_only('output/rmfs/0.rmfs')
+    IMP.rmf.link_hierarchies(rh, [root_hier])
+    IMP.rmf.load_frame(rh, RMF.FrameID(42))
+    del rh
+    model = po.add_model(e.model_group)
+\endcode
+
+If localization densities are available for the cluster, we can link to those
+too. For example, to add the density of the Rpb4 subunit for the entire cluster:
+
+\code{.py}
+# Look up the ihm.AsymUnit corresponding to a PMI component name
+asym = po.asym_units['Rpb4.0']
+# Add path to a local output file
+loc = ihm.location.OutputFileLocation('output/cluster0.Rpb4.mrc')
+den = ihm.model.LocalizationDensity(file=loc, asym_unit=asym)
+# Add to ensemble
+e.densities.append(den)
+\endcode
+
+## Correct number of output models {#fixnummodel}
+
+ProtocolOutput correctly notes that we ran Monte Carlo to generate 100 frames.
+However, in many modeling scenarios the modeling script is run multiple times
+on a compute cluster to generate several independent trajectories which are
+then combined. ProtocolOutput cannot know whether this happened. However, it
+is straightforward to use the python-ihm API to manually change the number
+of output models to match that reported in the publication:
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    # Correct number of output models to account for multiple runs
+    protocol = po.system.orphan_protocols[-1]
+    protocol.steps[-1].num_models_end = 5000000
+\endcode
+
+## Replace local links with DOIs {#adddois}
+
+[Recall from earlier](@ref linking) that ProtocolOutput adds local paths to
+the cross-link CSV files and the Python script itself, which won't be visible
+to end users. The simplest way to solve this issue is to put some or all of the
+files in zipfiles and upload them to a service that provides a DOI, such as
+[Zenodo](https://zenodo.org/) or [FigShare](https://figshare.com/), and then
+link to that DOI. We can do this by creating an
+[ihm.location.Repository object](https://python-ihm.readthedocs.io/en/latest/location.html#ihm.location.Repository)
+for each zipfile, and then using the [update_locations_in_repositories](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.update_locations_in_repositories)
+function to map local paths to files in the zipfile at the DOI:
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    import ihm.location
+    repo = ihm.location.Repository(doi="10.5281/zenodo.1218053", root="..",
+                   url="https://zenodo.org/record/1218053/files/tutorial.zip")
+    po.system.update_locations_in_repositories([repo])
+\endcode
+
+This assumes that `tutorial.zip` at the given DOI and URL was created by
+archiving all files under the parent directory (`..`). Thus the cross-link
+file which was previously linked with the local path `../data/polii_xlinks.csv`
+can now be found by downloading `tutorial.zip` and extracting
+`data/polii_xlinks.csv` from it.
+
 # Visualization {#visualization}
+
+mmCIF files can be viewed in many viewers. However, most viewers do not yet
+support the integrative modeling extensions, and so may only show the atomic
+parts of the model (if any). Integrative models can be viewed in
+[ChimeraX](https://www.rbvi.ucsf.edu/chimerax/) - be sure to use a recent
+nightly build, and open the file using the `format ihm` option,
+e.g. `open rnapii.cif format ihm`. [VMD](http://www.ks.uiuc.edu/Research/vmd/)
+is also reportedly working on support in their forthcoming 1.9.4 release.
