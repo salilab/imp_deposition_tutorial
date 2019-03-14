@@ -61,7 +61,7 @@ for modeling outside of %IMP itself, but does require everything to be done
 manually. For a good example of this approach, see the
 [modeling of Nup133](https://github.com/integrativemodeling/nup133/tree/master/outputs_foxs_ensemble_new/pdb-dev).
 (One example of the tradeoff between flexibility and manual coding:
-the crosslinks used in the study are stored in a
+the cross-links used in the study are stored in a
 [plain text file](https://github.com/integrativemodeling/nup133/blob/master/Crosslinks/DSS_EDC_crosslinks.txt)
 so a [custom Python class](https://github.com/integrativemodeling/nup133/blob/master/outputs_foxs_ensemble_new/pdb-dev/xlink.py)
 had to be written to parse them.)
@@ -150,7 +150,8 @@ deal of information about the system, including:
    everything that fits into an electron microscopy density map) (`_ihm_struct_assembly` table or [po.system.complete\_assembly](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System.complete_assembly)).
  - input experimental information, such as crystal structures, comparative
    models, or cross-links (`_ihm_dataset_list` table or [ihm.dataset objects](https://python-ihm.readthedocs.io/en/latest/dataset.html)).
- - information about each restraint, such as cross-linking (`_ihm_cross_link_list` table or [ihm.restraint.CrossLinkRestraint objects](https://python-ihm.readthedocs.io/en/latest/restraint.html#ihm.restraint.CrossLinkRestraint)).
+ - information about each restraint, such as cross-linking (`_ihm_cross_link_list` table or [ihm.restraint.CrossLinkRestraint objects](https://python-ihm.readthedocs.io/en/latest/restraint.html#ihm.restraint.CrossLinkRestraint))
+   or fit to the electron microscopy density map (`_ihm_3dem_restraint` table or [ihm.restraint.EM3DRestraint objects](https://python-ihm.readthedocs.io/en/latest/restraint.html#ihm.restraint.EM3DRestraint)).
  - the Monte Carlo simulation (`_ihm_modeling_protocol` table or [ihm.protocol objects](https://python-ihm.readthedocs.io/en/latest/protocol.html)).
 
 # Linking to other data {#linking}
@@ -172,7 +173,9 @@ For example, in this case ProtocolOutput is able to read the annotations of
 the input crystal structure used for the modeling ([see below](@ref annotation))
 and determine that it is stored in the PDB, so the relevant
 [1WCM](https://www.rcsb.org/structure/1WCM) identitifer is included in the
-mmCIF file (see the `_ihm_dataset_related_db_reference` table).
+mmCIF file (see the `_ihm_dataset_related_db_reference` table). (Similarly,
+the EMDB [EMD-1883](https://www.ebi.ac.uk/pdbe/entry/emdb/EMD-1883)
+identifier is used for the EM density map.)
 
 When a file is used for the modeling which cannot be tracked back to a database,
 ProtocolOutput will include its path (relative to that of the mmCIF file).
@@ -210,6 +213,9 @@ files are annotated as well as possible:
    `TITLE` records to the files for ProtocolOutput to pick up. See the
    [python-ihm docs](https://python-ihm.readthedocs.io/en/latest/metadata.html#ihm.metadata.PDBParser.parse_file)
    for more information.
+ - for GMM files used for the EM density restraint, keep the original MRC
+   file around and make sure that the `# data_fn:` header in the GMM file
+   points to it.
 
 # Polishing the deposition {#polishing}
 
