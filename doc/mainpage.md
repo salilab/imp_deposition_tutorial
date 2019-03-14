@@ -94,7 +94,7 @@ bs = IMP.pmi.macros.BuildSystem(m)
 
 if '--mmcif' in sys.argv:
     # Record the modeling protocol to an mmCIF file
-    po = IMP.pmi.mmcif.ProtocolOutput(open('rnapii.cif', 'w'))
+    po = IMP.pmi.mmcif.ProtocolOutput(open('rnapolii.cif', 'w'))
     bs.system.add_protocol_output(po)
     po.system.title = "Modeling of RNA Pol II"
     # Add publication
@@ -129,13 +129,13 @@ c1=IMP.pmi.macros.ReplicaExchange0(m, ..., test_mode=bs.dry_run)
 \endcode
 
 Finally, we can run the script with the `--mmcif` and `--dry-run` options
-to get the mmCIF output `rnapii.cif`:
+to get the mmCIF output `rnapolii.cif`:
 
 \code{.sh}
 python modeling.py --mmcif --dry-run
 \endcode
 
-The `rnapii.cif` file can be viewed in a text editor, or the `po.system`
+The `rnapolii.cif` file can be viewed in a text editor, or the `po.system`
 object can be explored in a Python console. Each contains a great
 deal of information about the system, including:
 
@@ -247,10 +247,26 @@ if '--mmcif' in sys.argv:
     chen.linker = ihm.cross_linkers.bs3
 \endcode
 
+## Correct number of output models {#fixnummodel}
+
+ProtocolOutput correctly notes that we ran Monte Carlo to generate 20000 frames.
+However, in many modeling scenarios the modeling script is run multiple times
+on a compute cluster to generate several independent trajectories which are
+then combined. ProtocolOutput cannot know whether this happened. However, it
+is straightforward to use the python-ihm API to manually change the number
+of output models to match that reported in the publication:
+
+\code{.py}
+if '--mmcif' in sys.argv:
+    # Correct number of output models to account for multiple runs
+    protocol = po.system.orphan_protocols[-1]
+    protocol.steps[-1].num_models_end = 200000
+\endcode
+
 ## Add model coordinates {#addcoords}
 
 The current mmCIF file contains all of the input data, and notes that Monte
-Carlo was used to generate 100 frames, but doesn't actually store any of those
+Carlo was used to generate frames, but doesn't actually store any of those
 coordinates in the file. Ultimately this information will be added automatically
 by PMI model analysis and validation scripts, but for the time being any
 information about clustering, localization densities, and final models needs
@@ -260,17 +276,18 @@ to be added to the file using the python-ihm API:
 if '--mmcif' in sys.argv:
     # Get last protocol in the file
     protocol = po.system.orphan_protocols[-1]
-    # State that we filtered the 100 frames down to one cluster of 10 models:
+    # State that we filtered the 200000 frames down to one cluster of
+    # 100 models:
     analysis = ihm.analysis.Analysis()
     protocol.analyses.append(analysis)
     analysis.steps.append(ihm.analysis.ClusterStep(
-                            feature='RMSD', num_models_begin=100,
-                            num_models_end=10))
+                            feature='RMSD', num_models_begin=200000,
+                            num_models_end=100))
     # Create an ensemble for the cluster (warning: _add_simple_ensemble
     # is subject to change in future IMP releases) and deposit a single
-    # model (let's say it's frame 42 from the output RMF file)
+    # representative model (let's say it's frame 42 from the output RMF file)
     e = po._add_simple_ensemble(analysis.steps[-1],
-                                name="Cluster 0", num_models=10,
+                                name="Cluster 0", num_models=100,
                                 drmsd=12.2, num_models_deposited=1,
                                 localization_densities={}, ensemble_file=None)
     # Add the model from RMF
@@ -292,22 +309,6 @@ loc = ihm.location.OutputFileLocation('output/cluster0.Rpb4.mrc')
 den = ihm.model.LocalizationDensity(file=loc, asym_unit=asym)
 # Add to ensemble
 e.densities.append(den)
-\endcode
-
-## Correct number of output models {#fixnummodel}
-
-ProtocolOutput correctly notes that we ran Monte Carlo to generate 100 frames.
-However, in many modeling scenarios the modeling script is run multiple times
-on a compute cluster to generate several independent trajectories which are
-then combined. ProtocolOutput cannot know whether this happened. However, it
-is straightforward to use the python-ihm API to manually change the number
-of output models to match that reported in the publication:
-
-\code{.py}
-if '--mmcif' in sys.argv:
-    # Correct number of output models to account for multiple runs
-    protocol = po.system.orphan_protocols[-1]
-    protocol.steps[-1].num_models_end = 5000000
 \endcode
 
 ## Replace local links with DOIs {#adddois}
@@ -343,5 +344,5 @@ support the integrative modeling extensions, and so may only show the atomic
 parts of the model (if any). Integrative models can be viewed in
 [ChimeraX](https://www.rbvi.ucsf.edu/chimerax/) - be sure to use a recent
 nightly build, and open the file using the `format ihm` option,
-e.g. `open rnapii.cif format ihm`. [VMD](http://www.ks.uiuc.edu/Research/vmd/)
+e.g. `open rnapolii.cif format ihm`. [VMD](http://www.ks.uiuc.edu/Research/vmd/)
 is also reportedly working on support in their forthcoming 1.9.4 release.
