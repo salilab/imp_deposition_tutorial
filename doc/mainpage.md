@@ -79,7 +79,15 @@ Additional information not in the modeling script itself, such as the
 resulting publication, can be added using the
 [python-ihm API](https://python-ihm.readthedocs.io/en/latest/usage.html).
 
-First, we need to import the PMI and python-ihm Python modules:
+We will demonstrate ProtocolOutput by using it to make a deposition of the
+RNA Pol II stalk modeling, as covered in the
+[introductory PMI tutorial](https://integrativemodeling.org/tutorials/rnapolii_stalk/).
+First, download the files for this tutorial by using the "Clone or download"
+link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/master). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/master/rnapolii/modeling/modeling.py)
+in the `rnapolii/modeling` subdirectory to capture the study as mmCIF.
+
+The first modification to `modeling.py` is to import the PMI mmCIF and
+python-ihm Python modules:
 
 \code{.py}
 import IMP.pmi.mmcif
@@ -226,10 +234,10 @@ files are annotated as well as possible:
 
 ProtocolOutput attempts to automatically generate as much as possible of the
 mmCIF file, but there are some areas where manual intervention is necessary
-because the data is missing, or its guess was incomplete. This data can be
+because the data is missing, or its guess was incorrect. This data can be
 corrected by manipulating the [ihm.System object](https://python-ihm.readthedocs.io/en/latest/main.html#ihm.System)
-directly, at the script, immediately before we call ProtocolOutput's `flush`
-method. We will look at a few examples in this section.
+directly, at the end of the script, immediately before we call ProtocolOutput's
+`flush` method. We will look at a few examples in this section.
 
 ## Cross-linker type {#xltype}
 
@@ -354,6 +362,13 @@ mmCIF files can be viewed in many viewers. However, most viewers do not yet
 support the integrative modeling extensions, and so may only show the atomic
 parts of the model (if any). Integrative models can be viewed in
 [ChimeraX](https://www.rbvi.ucsf.edu/chimerax/) - be sure to use a recent
-nightly build, and open the file using the `format ihm` option,
-e.g. `open rnapolii.cif format ihm`. [VMD](http://www.ks.uiuc.edu/Research/vmd/)
+nightly build, and open the file from the ChimeraX command line using the
+`format ihm` option, e.g. `open rnapolii.cif format ihm`.
+[VMD](http://www.ks.uiuc.edu/Research/vmd/)
 is also reportedly working on support in their forthcoming 1.9.4 release.
+
+An example view of the deposition, as rendered by ChimeraX, is shown below.
+The EM map is shown as a mesh, the DSS cross-links as green dashed lines, and
+the BS3 cross-links as blue dashed lines.
+
+\image html chimerax.png width=500px
