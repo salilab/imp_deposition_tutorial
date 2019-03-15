@@ -68,6 +68,13 @@ had to be written to parse them.)
 
 The second approach will be explored in this tutorial.
 
+@note This demonstration uses functionality only introduced in %IMP on
+      Mar 15th, 2019. It will not fully work (although the procedure is similar)
+      with the latest stable release (2.10.1). Either download
+      a [nightly build](https://integrativemodeling.org/download.html#develop)
+      or [build from source](@ref installation_source) using the `develop`
+      branch from GitHub.
+
 # Basic usage of ProtocolOutput {#basicusage}
 
 [ProtocolOutput](@ref IMP::pmi::mmcif::ProtocolOutput) is designed to be
