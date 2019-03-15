@@ -4,5 +4,5 @@ This tutorial covers the procedure for depositing integrative modeling
 studies using [IMP](https://integrativemodeling.org/)
 in the [PDB-Dev database](https://pdb-dev.wwpdb.org/) in mmCIF format.
 
-See [the IMP website](https://integrativemodeling.org/tutorials/deposition/)
+See [the IMP website](https://integrativemodeling.org/tutorials/deposition/develop/)
 for the tutorial text.
