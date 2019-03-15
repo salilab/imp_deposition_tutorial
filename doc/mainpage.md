@@ -90,7 +90,7 @@ We will demonstrate ProtocolOutput by using it to make a deposition of the
 RNA Pol II stalk modeling, as covered in the
 [introductory PMI tutorial](https://integrativemodeling.org/tutorials/rnapolii_stalk/).
 First, download the files for this tutorial by using the "Clone or download"
-link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/master). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/master/rnapolii/modeling/modeling.py)
+link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/develop). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/develop/rnapolii/modeling/modeling.py)
 in the `rnapolii/modeling` subdirectory to capture the study as mmCIF.
 
 The first modification to `modeling.py` is to import the PMI mmCIF and
