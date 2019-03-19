@@ -275,8 +275,10 @@ if '--mmcif' in sys.argv:
     e.densities.append(den)
 
     # Replace local links with DOIs
-    repo = ihm.location.Repository(doi="10.5281/zenodo.1218053", root="..",
-                   url="https://zenodo.org/record/1218053/files/tutorial.zip")
+    repo = ihm.location.Repository(doi="10.5281/zenodo.2598744", root="../..",
+                  top_directory="salilab-imp_deposition_tutorial-ad8f79d",
+                  url="https://zenodo.org/record/2598744/files/salilab/"
+                      "imp_deposition_tutorial-v0.1.zip")
     po.system.update_locations_in_repositories([repo])
 
     po.flush()
