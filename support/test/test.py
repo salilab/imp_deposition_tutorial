@@ -52,11 +52,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(xl1.linker.auth_name, ihm.cross_linkers.dss.auth_name)
         self.assertEqual(len(xl1.experimental_cross_links), 157)
         self.assertEqual(len(xl1.cross_links), 153)
-        self.assertEqual(xl1.dataset.location.path, 'data/polii_xlinks.csv')
+        self.assertEqual(xl1.dataset.location.repo.url[:19],
+                         'https://zenodo.org/')
+        self.assertEqual(xl1.dataset.location.path[-30:],
+                         'rnapolii/data/polii_xlinks.csv')
         self.assertEqual(xl2.linker.auth_name, ihm.cross_linkers.bs3.auth_name)
         em = s.restraints[2]
-        self.assertEqual(em.dataset.location.path,
-                         'data/emd_1883.map.mrc.gmm.50.txt')
+        self.assertEqual(em.dataset.location.path[-41:],
+                         'rnapolii/data/emd_1883.map.mrc.gmm.50.txt')
         self.assertEqual(len(em.dataset.parents), 1)
         p = em.dataset.parents[0]
         self.assertEqual(p.location.db_name, 'EMDB')
