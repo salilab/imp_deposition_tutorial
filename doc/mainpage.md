@@ -345,16 +345,27 @@ function to map local paths to files in the zipfile at the DOI:
 \code{.py}
 if '--mmcif' in sys.argv:
     import ihm.location
-    repo = ihm.location.Repository(doi="10.5281/zenodo.1218053", root="..",
-                   url="https://zenodo.org/record/1218053/files/tutorial.zip")
+    repo = ihm.location.Repository(doi="10.5281/zenodo.2598744", root="../..",
+                  top_directory="salilab-imp_deposition_tutorial-ad8f79d",
+                  url="https://zenodo.org/record/2598744/files/salilab/"
+                      "imp_deposition_tutorial-v0.1.zip")
     po.system.update_locations_in_repositories([repo])
 \endcode
 
-This assumes that `tutorial.zip` at the given DOI and URL was created by
-archiving all files under the parent directory (`..`). Thus the cross-link
-file which was previously linked with the local path `../data/polii_xlinks.csv`
-can now be found by downloading `tutorial.zip` and extracting
-`data/polii_xlinks.csv` from it.
+This assumes that the zipfile at the given DOI and URL was created by
+archiving all files under the top directory of the
+[GitHub repository](https://github.com/salilab/imp_deposition_tutorial)
+(`../..` relative to the directory containing the script).
+(It was actually created automatically [by Zenodo](https://zenodo.org) when
+a new release of this tutorial was created on GitHub. Zenodo puts all the files
+in the zipfile under a uniquely-named directory, so we need to set
+`top_directory` to match.)
+
+Thus the cross-link file which was previously linked with the local path
+`../data/polii_xlinks.csv` can now be found by downloading
+`imp_deposition_tutorial-v0.1.zip` and extracting
+`salilab-imp_deposition_tutorial-ad8f79d/rnapolii/data/polii_xlinks.csv`
+from it.
 
 # Visualization {#visualization}
 
