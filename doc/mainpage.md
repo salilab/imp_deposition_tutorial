@@ -353,10 +353,10 @@ function to map local paths to files in the zipfile at the DOI:
 \code{.py}
 if '--mmcif' in sys.argv:
     import ihm.location
-    repo = ihm.location.Repository(doi="10.5281/zenodo.2598744", root="../..",
-                  top_directory="salilab-imp_deposition_tutorial-ad8f79d",
-                  url="https://zenodo.org/record/2598744/files/salilab/"
-                      "imp_deposition_tutorial-v0.1.zip")
+    repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
+                  top_directory="salilab-imp_deposition_tutorial-1ad5919",
+                  url="https://zenodo.org/record/2598760/files/salilab/"
+                      "imp_deposition_tutorial-v0.2.zip")
     po.system.update_locations_in_repositories([repo])
 \endcode
 
@@ -371,8 +371,8 @@ in the zipfile under a uniquely-named directory, so we need to set
 
 Thus the cross-link file which was previously linked with the local path
 `../data/polii_xlinks.csv` can now be found by downloading
-`imp_deposition_tutorial-v0.1.zip` and extracting
-`salilab-imp_deposition_tutorial-ad8f79d/rnapolii/data/polii_xlinks.csv`
+`imp_deposition_tutorial-v0.2.zip` and extracting
+`salilab-imp_deposition_tutorial-1ad5919/rnapolii/data/polii_xlinks.csv`
 from it.
 
 # Visualization {#visualization}
