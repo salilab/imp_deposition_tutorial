@@ -394,6 +394,11 @@ the BS3 cross-links as blue dashed lines.
 
 \image html chimerax.png width=500px
 
+## Web browser {#browser}
+
+mmCIF files can also be viewed in a web browser, using
+[Mol\* Viewer](https://molstar.org/viewer).
+
 ## Plain text {#plain}
 
 mmCIF files are also just plain text files, and can be viewed in any text
