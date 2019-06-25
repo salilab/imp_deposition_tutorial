@@ -68,13 +68,6 @@ had to be written to parse them.)
 
 The second approach will be explored in this tutorial.
 
-@note This demonstration uses functionality only introduced in %IMP on
-      Mar 15th, 2019. It will not fully work (although the procedure is similar)
-      with the latest stable release (2.10.1). Either download
-      a [nightly build](https://integrativemodeling.org/download.html#develop)
-      or [build from source](@ref installation_source) using the `develop`
-      branch from GitHub.
-
 # Basic usage of ProtocolOutput {#basicusage}
 
 [ProtocolOutput](@ref IMP::pmi::mmcif::ProtocolOutput) is designed to be
@@ -90,7 +83,7 @@ We will demonstrate ProtocolOutput by using it to make a deposition of the
 RNA Pol II stalk modeling, as covered in the
 [introductory PMI tutorial](https://integrativemodeling.org/tutorials/rnapolii_stalk/).
 First, download the files for this tutorial by using the "Clone or download"
-link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/develop). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/develop/rnapolii/modeling/modeling.py)
+link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/master/rnapolii/modeling/modeling.py)
 in the `rnapolii/modeling` subdirectory to capture the study as mmCIF.
 
 The first modification to `modeling.py` is to import the PMI mmCIF and
