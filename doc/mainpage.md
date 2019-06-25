@@ -68,6 +68,13 @@ had to be written to parse them.)
 
 The second approach will be explored in this tutorial.
 
+@note This demonstration uses functionality only introduced in %IMP on
+      Mar 15th, 2019. It will not fully work (although the procedure is similar)
+      with the latest stable release (2.10.1). Either download
+      a [nightly build](https://integrativemodeling.org/download.html#develop)
+      or [build from source](@ref installation_source) using the `develop`
+      branch from GitHub.
+
 # Basic usage of ProtocolOutput {#basicusage}
 
 [ProtocolOutput](@ref IMP::pmi::mmcif::ProtocolOutput) is designed to be
@@ -83,7 +90,7 @@ We will demonstrate ProtocolOutput by using it to make a deposition of the
 RNA Pol II stalk modeling, as covered in the
 [introductory PMI tutorial](https://integrativemodeling.org/tutorials/rnapolii_stalk/).
 First, download the files for this tutorial by using the "Clone or download"
-link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/master). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/master/rnapolii/modeling/modeling.py)
+link at the [tutorial's GitHub page](https://github.com/salilab/imp_deposition_tutorial/tree/develop). We will then modify the [modeling.py script](https://github.com/salilab/imp_deposition_tutorial/blob/develop/rnapolii/modeling/modeling.py)
 in the `rnapolii/modeling` subdirectory to capture the study as mmCIF.
 
 The first modification to `modeling.py` is to import the PMI mmCIF and
@@ -143,7 +150,8 @@ to get the mmCIF output `rnapolii.cif`:
 python modeling.py --mmcif --dry-run
 \endcode
 
-The `rnapolii.cif` file can be viewed in a text editor, or the `po.system`
+The `rnapolii.cif` file can be viewed [in a text editor](@ref plain) or
+[with ChimeraX](@ref chimerax), or the `po.system`
 object can be explored in a Python console. Each contains a great
 deal of information about the system, including:
 
@@ -369,6 +377,8 @@ from it.
 
 # Visualization {#visualization}
 
+## ChimeraX {#chimerax}
+
 mmCIF files can be viewed in many viewers. However, most viewers do not yet
 support the integrative modeling extensions, and so may only show the atomic
 parts of the model (if any). Integrative models can be viewed in
@@ -383,3 +393,39 @@ The EM map is shown as a mesh, the DSS cross-links as green dashed lines, and
 the BS3 cross-links as blue dashed lines.
 
 \image html chimerax.png width=500px
+
+## Web browser {#browser}
+
+mmCIF files can also be viewed in a web browser, using
+[Mol\* Viewer](https://molstar.org/viewer).
+
+## Plain text {#plain}
+
+mmCIF files are also just plain text files, and can be viewed in any text
+editor (for example to check for errors, particularly for categories that
+ChimeraX doesn't support yet). Most of the data is stored as simple tables
+(look for the `loop_` keyword in the file). For example, the coordinates of
+the coarse-grained beads are stored in the [_ihm_sphere_obj_site table](http://mmcif.wwpdb.org/dictionaries/mmcif_ihm.dic/Categories/ihm_sphere_obj_site.html),
+the start of which in `rnapolii.cif` looks like:
+
+\code
+loop_
+_ihm_sphere_obj_site.ordinal_id
+_ihm_sphere_obj_site.entity_id
+_ihm_sphere_obj_site.seq_id_begin
+_ihm_sphere_obj_site.seq_id_end
+_ihm_sphere_obj_site.asym_id
+_ihm_sphere_obj_site.Cartn_x
+_ihm_sphere_obj_site.Cartn_y
+_ihm_sphere_obj_site.Cartn_z
+_ihm_sphere_obj_site.object_radius
+_ihm_sphere_obj_site.rmsf
+_ihm_sphere_obj_site.model_id
+1 1 1 1 A 158.180 180.876 96.861 3.068 . 1
+2 1 2 2 A 105.913 135.689 154.058 2.888 . 1
+3 1 3 3 A 104.305 132.810 156.027 2.273 . 1
+4 1 4 4 A 101.027 134.743 156.557 3.008 . 1
+\endcode
+
+This simply states that a sphere representing residue 1 in chain A is centered
+at (158.180, 180.876, 96.861) and has radius 3.068, and so on.
