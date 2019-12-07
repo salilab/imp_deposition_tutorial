@@ -44,7 +44,7 @@ topology = IMP.pmi.topology.TopologyReader(topology_file,
 bs = IMP.pmi.macros.BuildSystem(m)
 
 # Record the modeling protocol to an mmCIF file
-po = IMP.pmi.mmcif.ProtocolOutput(open('rnapolii.cif', 'w'))
+po = IMP.pmi.mmcif.ProtocolOutput(None)
 bs.system.add_protocol_output(po)
 po.system.title = "Modeling of RNA Pol II"
 # Add publication
@@ -212,6 +212,12 @@ mc1=IMP.pmi.macros.ReplicaExchange0(m,
 # Start Sampling
 mc1.execute_macro()
 
+po.finalize()
+
+import ihm.dumper
+with open('initial.cif', 'w') as fh:
+    ihm.dumper.write(fh, [po.system])
+
 import ihm.cross_linkers
 import ihm.location
 import ihm.model
@@ -265,4 +271,6 @@ repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
                       "imp_deposition_tutorial-v0.2.zip")
 po.system.update_locations_in_repositories([repo])
 
-po.flush()
+import ihm.dumper
+with open('rnapolii.cif', 'w') as fh:
+    ihm.dumper.write(fh, [po.system])
