@@ -242,14 +242,19 @@ protocol.analyses.append(analysis)
 analysis.steps.append(ihm.analysis.ClusterStep(
                       feature='RMSD', num_models_begin=200000,
                       num_models_end=100))
-# Create an ensemble for the cluster (warning: _add_simple_ensemble
-# is subject to change in future IMP releases) and deposit a single
-# representative model (let's say it's frame 42 from the output RMF file)
-e = po._add_simple_ensemble(analysis.steps[-1],
-                            name="Cluster 0", num_models=100,
-                            drmsd=12.2, num_models_deposited=1,
-                            localization_densities={}, ensemble_file=None)
-# Add the model from RMF
+
+mg = ihm.model.ModelGroup(name="Cluster 0")
+
+# Add to last state
+po.system.state_groups[-1][-1].append(mg)
+
+e = ihm.model.Ensemble(model_group=mg,
+                       num_models=100,
+                       post_process=analysis.steps[-1],
+                       name="Cluster 0")
+po.system.ensembles.append(e)
+
+# Add the model from RMF (let's say it's frame 42 from the output RMF file)
 rh = RMF.open_rmf_file_read_only('output/rmfs/0.rmf3')
 IMP.rmf.link_hierarchies(rh, [root_hier])
 IMP.rmf.load_frame(rh, RMF.FrameID(42))
