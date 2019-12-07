@@ -2,3 +2,8 @@ excluded.None.xl.db
 included.None.xl.db
 missing.None.xl.db
 rnapolii.cif
+.cache
+.ipynb_checkpoints
+Doxyfile
+deposition.md
+html

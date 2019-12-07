@@ -1,17 +1,8 @@
-"""
-#############################################
-##  IMP Tutorial Script
-##
-#############################################
-#
-# Short modeling script combining EM and Crosslinking data
-# to localize two domains of RNA Polymerase II
-#
-# Authors: Riccardo Pellarin, Charles Greenberg, Daniel Saltzberg
-#
-# References: Papers where this data is shown...
-#
-"""
+#!/usr/bin/env python3
+
+import IMP.pmi.mmcif
+import ihm
+
 import IMP
 import IMP.core
 import IMP.algebra
@@ -27,8 +18,6 @@ import IMP.pmi.samplers
 import IMP.pmi.output
 import IMP.pmi.macros
 import IMP.pmi.topology
-import IMP.pmi.mmcif
-import ihm
 
 import os
 import sys
@@ -54,15 +43,12 @@ topology = IMP.pmi.topology.TopologyReader(topology_file,
 # Use the BuildSystem macro to build states from the topology file
 bs = IMP.pmi.macros.BuildSystem(m)
 
-if '--mmcif' in sys.argv:
-    # Record the modeling protocol to an mmCIF file
-    po = IMP.pmi.mmcif.ProtocolOutput(open('rnapolii.cif', 'w'))
-    bs.system.add_protocol_output(po)
-    po.system.title = "Modeling of RNA Pol II"
-    # Add publication
-    po.system.citations.append(ihm.Citation.from_pubmed_id(25161197))
-
-bs.dry_run = '--dry-run' in sys.argv
+# Record the modeling protocol to an mmCIF file
+po = IMP.pmi.mmcif.ProtocolOutput(open('rnapolii.cif', 'w'))
+bs.system.add_protocol_output(po)
+po.system.title = "Modeling of RNA Pol II"
+# Add publication
+po.system.citations.append(ihm.Citation.from_pubmed_id(25161197))
 
 # Each state can be specified by a topology file.
 bs.add_state(topology)
@@ -221,63 +207,62 @@ mc1=IMP.pmi.macros.ReplicaExchange0(m,
                                     monte_carlo_steps=num_mc_steps,
                                     number_of_frames=num_frames,
                                     global_output_directory="output",
-                                    test_mode=bs.dry_run)
+                                    test_mode=True)
 
 # Start Sampling
 mc1.execute_macro()
 
-if '--mmcif' in sys.argv:
-    import ihm.cross_linkers
-    import ihm.location
-    import ihm.model
-    import RMF
-    import IMP.rmf
+import ihm.cross_linkers
+import ihm.location
+import ihm.model
+import RMF
+import IMP.rmf
 
-    # Fix linker types to match those actually used (DSS and BS3)
-    trnka, chen = [r for r in po.system.restraints if hasattr(r, 'linker')]
-    trnka.linker = ihm.cross_linkers.dss
-    chen.linker = ihm.cross_linkers.bs3
+# Fix linker types to match those actually used (DSS and BS3)
+trnka, chen = [r for r in po.system.restraints if hasattr(r, 'linker')]
+trnka.linker = ihm.cross_linkers.dss
+chen.linker = ihm.cross_linkers.bs3
 
-    # Correct number of output models to account for multiple runs
-    protocol = po.system.orphan_protocols[-1]
-    protocol.steps[-1].num_models_end = 200000
+# Correct number of output models to account for multiple runs
+protocol = po.system.orphan_protocols[-1]
+protocol.steps[-1].num_models_end = 200000
 
-    # Get last protocol in the file
-    protocol = po.system.orphan_protocols[-1]
-    # State that we filtered the 200000 frames down to one cluster of
-    # 100 models:
-    analysis = ihm.analysis.Analysis()
-    protocol.analyses.append(analysis)
-    analysis.steps.append(ihm.analysis.ClusterStep(
-                            feature='RMSD', num_models_begin=200000,
-                            num_models_end=100))
-    # Create an ensemble for the cluster (warning: _add_simple_ensemble
-    # is subject to change in future IMP releases) and deposit a single
-    # representative model (let's say it's frame 42 from the output RMF file)
-    e = po._add_simple_ensemble(analysis.steps[-1],
-                                name="Cluster 0", num_models=100,
-                                drmsd=12.2, num_models_deposited=1,
-                                localization_densities={}, ensemble_file=None)
-    # Add the model from RMF
-    rh = RMF.open_rmf_file_read_only('output/rmfs/0.rmf3')
-    IMP.rmf.link_hierarchies(rh, [root_hier])
-    IMP.rmf.load_frame(rh, RMF.FrameID(42))
-    del rh
-    model = po.add_model(e.model_group)
+# Get last protocol in the file
+protocol = po.system.orphan_protocols[-1]
+# State that we filtered the 200000 frames down to one cluster of
+# 100 models:
+analysis = ihm.analysis.Analysis()
+protocol.analyses.append(analysis)
+analysis.steps.append(ihm.analysis.ClusterStep(
+                      feature='RMSD', num_models_begin=200000,
+                      num_models_end=100))
+# Create an ensemble for the cluster (warning: _add_simple_ensemble
+# is subject to change in future IMP releases) and deposit a single
+# representative model (let's say it's frame 42 from the output RMF file)
+e = po._add_simple_ensemble(analysis.steps[-1],
+                            name="Cluster 0", num_models=100,
+                            drmsd=12.2, num_models_deposited=1,
+                            localization_densities={}, ensemble_file=None)
+# Add the model from RMF
+rh = RMF.open_rmf_file_read_only('output/rmfs/0.rmf3')
+IMP.rmf.link_hierarchies(rh, [root_hier])
+IMP.rmf.load_frame(rh, RMF.FrameID(42))
+del rh
+model = po.add_model(e.model_group)
 
-    # Look up the ihm.AsymUnit corresponding to a PMI component name
-    asym = po.asym_units['Rpb4.0']
-    # Add path to a local output file
-    loc = ihm.location.OutputFileLocation('output/cluster0.Rpb4.mrc')
-    den = ihm.model.LocalizationDensity(file=loc, asym_unit=asym)
-    # Add to ensemble
-    e.densities.append(den)
+# Look up the ihm.AsymUnit corresponding to a PMI component name
+asym = po.asym_units['Rpb4.0']
+# Add path to a local output file
+loc = ihm.location.OutputFileLocation('output/cluster0.Rpb4.mrc')
+den = ihm.model.LocalizationDensity(file=loc, asym_unit=asym)
+# Add to ensemble
+e.densities.append(den)
 
-    # Replace local links with DOIs
-    repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
+# Replace local links with DOIs
+repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
                   top_directory="salilab-imp_deposition_tutorial-1ad5919",
                   url="https://zenodo.org/record/2598760/files/salilab/"
                       "imp_deposition_tutorial-v0.2.zip")
-    po.system.update_locations_in_repositories([repo])
+po.system.update_locations_in_repositories([repo])
 
-    po.flush()
+po.flush()

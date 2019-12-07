@@ -16,8 +16,7 @@ class Tests(unittest.TestCase):
         """Test generation of mmCIF file"""
         # Run modeling
         os.chdir(os.path.join(TOPDIR, 'modeling'))
-        p = subprocess.check_call(["python", 'modeling.py', "--mmcif",
-                                   "--dry-run"])
+        p = subprocess.check_call(["python", 'deposition.py'])
         self._check_mmcif_file("rnapolii.cif")
 
     def _check_mmcif_file(self, fname):
