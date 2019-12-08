@@ -276,6 +276,6 @@ repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
                       "imp_deposition_tutorial-v0.2.zip")
 po.system.update_locations_in_repositories([repo])
 
-import ihm.dumper
+po.finalize()
 with open('rnapolii.cif', 'w') as fh:
     ihm.dumper.write(fh, [po.system])
