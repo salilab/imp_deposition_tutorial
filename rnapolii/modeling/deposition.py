@@ -329,7 +329,11 @@ with open('rnapolii.cif') as fh:
     s, = ihm.reader.read(fh)
 print(s.title, s.restraints, s.ensembles, s.state_groups)
 
-import urllib.request
-with urllib.request.urlopen('https://pdb-dev.wwpdb.org/static/cif/PDBDEV_00000014.cif') as fh:
+try:
+    import urllib.request as urllib2  # python3
+except ImportError:
+    import urllib2  # python2
+
+with urllib2.urlopen('https://pdb-dev.wwpdb.org/static/cif/PDBDEV_00000014.cif') as fh:
     s, = ihm.reader.read(fh)
 print(s.title, s.restraints, s.ensembles, s.state_groups)
