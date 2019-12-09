@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+# Imports needed to use ProtocolOutput
 import IMP.pmi.mmcif
 import ihm
+import ihm.location
+import ihm.model
 
 import IMP
 import IMP.core
@@ -214,24 +217,51 @@ mc1.execute_macro()
 
 po.finalize()
 
+s = po.system
+
+print("all subunits:",
+      [a.details for a in s.asym_units])
+
+print("first subunit sequence:",
+      "".join(r.code for r in s.asym_units[0].entity.sequence))
+
+print("all restraints on the system:", s.restraints)
+
 import ihm.dumper
 with open('initial.cif', 'w') as fh:
-    ihm.dumper.write(fh, [po.system])
+    ihm.dumper.write(fh, [s])
 
+print("restraint datasets:", [r.dataset for r in s.restraints])
+
+# Datasets for XL-MS restraint
+for r in s.restraints:
+    if isinstance(r, ihm.restraint.CrossLinkRestraint):
+        print("XL-MS dataset at:", r.dataset.location.path)
+        print("Details:", r.dataset.location.details)
+
+# Dataset for EM restraint
+em, = [r for r in s.restraints
+       if isinstance(r, ihm.restraint.EM3DRestraint)]
+d = em.dataset
+print("GMM file at", d.location.path)
+print("is derived from EMDB entry", d.parents[0].location.access_code)
+
+# Definitions of some common crosslinkers
 import ihm.cross_linkers
-import ihm.location
-import ihm.model
-import RMF
-import IMP.rmf
 
 # Fix linker types to match those actually used (DSS and BS3)
-trnka, chen = [r for r in po.system.restraints if hasattr(r, 'linker')]
+trnka, chen = [r for r in s.restraints
+               if isinstance(r, ihm.restraint.CrossLinkRestraint)]
 trnka.linker = ihm.cross_linkers.dss
 chen.linker = ihm.cross_linkers.bs3
 
+# Get last step of last protocol (protocol is an 'orphan' because
+# we haven't used it for a model yet)
+last_step = s.orphan_protocols[-1].steps[-1]
+print(last_step.num_models_end)
+
 # Correct number of output models to account for multiple runs
-protocol = po.system.orphan_protocols[-1]
-protocol.steps[-1].num_models_end = 200000
+last_step.num_models_end = 200000
 
 # Get last protocol in the file
 protocol = po.system.orphan_protocols[-1]
@@ -254,6 +284,9 @@ e = ihm.model.Ensemble(model_group=mg,
                        name="Cluster 0")
 po.system.ensembles.append(e)
 
+import RMF
+import IMP.rmf
+
 # Add the model from RMF (let's say it's frame 42 from the output RMF file)
 rh = RMF.open_rmf_file_read_only('output/rmfs/0.rmf3')
 IMP.rmf.link_hierarchies(rh, [root_hier])
@@ -274,8 +307,29 @@ repo = ihm.location.Repository(doi="10.5281/zenodo.2598760", root="../..",
                   top_directory="salilab-imp_deposition_tutorial-1ad5919",
                   url="https://zenodo.org/record/2598760/files/salilab/"
                       "imp_deposition_tutorial-v0.2.zip")
-po.system.update_locations_in_repositories([repo])
+s.update_locations_in_repositories([repo])
+
+# Datasets for XL-MS restraint
+trnka, chen = [r for r in s.restraints
+               if isinstance(r, ihm.restraint.CrossLinkRestraint)]
+d = trnka.dataset
+print("XL-MS dataset now at %s/%s inside %s"
+      % (d.location.repo.top_directory,
+         d.location.path, d.location.repo.url))
 
 po.finalize()
 with open('rnapolii.cif', 'w') as fh:
     ihm.dumper.write(fh, [po.system])
+
+#with open('rnapoliii.bcif', 'wb') as fh:
+#    ihm.dumper.write(fh, [s], format='BCIF')
+
+import ihm.reader
+with open('rnapolii.cif') as fh:
+    s, = ihm.reader.read(fh)
+print(s.title, s.restraints, s.ensembles, s.state_groups)
+
+import urllib.request
+with urllib.request.urlopen('https://pdb-dev.wwpdb.org/static/cif/PDBDEV_00000014.cif') as fh:
+    s, = ihm.reader.read(fh)
+print(s.title, s.restraints, s.ensembles, s.state_groups)
