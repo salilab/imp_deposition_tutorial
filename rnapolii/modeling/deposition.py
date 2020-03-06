@@ -334,6 +334,6 @@ try:
 except ImportError:
     import urllib2  # python2
 
-fh = urllib2.urlopen('https://pdb-dev.wwpdb.org/static/cif/PDBDEV_00000014.cif')
+fh = urllib2.urlopen('https://pdb-dev.wwpdb.org/cif/PDBDEV_00000014.cif')
 s, = ihm.reader.read(fh)
 print(s.title, s.restraints, s.ensembles, s.state_groups)
