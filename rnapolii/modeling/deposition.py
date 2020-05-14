@@ -47,7 +47,7 @@ topology = IMP.pmi.topology.TopologyReader(topology_file,
 bs = IMP.pmi.macros.BuildSystem(m)
 
 # Record the modeling protocol to an mmCIF file
-po = IMP.pmi.mmcif.ProtocolOutput(None)
+po = IMP.pmi.mmcif.ProtocolOutput()
 bs.system.add_protocol_output(po)
 po.system.title = "Modeling of RNA Pol II"
 # Add publication
