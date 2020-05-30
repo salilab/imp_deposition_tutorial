@@ -21,6 +21,7 @@ import IMP.pmi.samplers
 import IMP.pmi.output
 import IMP.pmi.macros
 import IMP.pmi.topology
+import ihm.cross_linkers
 
 import os
 import sys
@@ -129,11 +130,12 @@ xl1db.create_set_from_file(datadirectory+'polii_xlinks.csv')
 
 xl1 = IMP.pmi.restraints.crosslinking.CrossLinkingMassSpectrometryRestraint(
                                    root_hier=root_hier,
-                                   CrossLinkDataBase=xl1db,
+                                   database=xl1db,
                                    length=21.0,
                                    slope=0.01,
                                    resolution=1.0,
                                    label="Trnka",
+                                   linker=ihm.cross_linkers.dss,
                                    weight=1.)
 
 xl1.add_to_model()             # crosslink must be added to the model
@@ -154,11 +156,12 @@ xl2db.create_set_from_file(datadirectory+'polii_juri.csv')
 
 xl2 = IMP.pmi.restraints.crosslinking.CrossLinkingMassSpectrometryRestraint(
                                    root_hier=root_hier,
-                                   CrossLinkDataBase=xl2db,
+                                   database=xl2db,
                                    length=21.0,
                                    slope=0.01,
                                    resolution=1.0,
                                    label="Chen",
+                                   linker=ihm.cross_linkers.bs3,
                                    weight=1.)
 xl2.add_to_model()
 outputobjects.append(xl2)
@@ -248,7 +251,7 @@ print("is derived from EMDB entry", d.parents[0].location.access_code)
 # Definitions of some common crosslinkers
 import ihm.cross_linkers
 
-# Fix linker types to match those actually used (DSS and BS3)
+# Set linker types to match those used (DSS and BS3)
 trnka, chen = [r for r in s.restraints
                if isinstance(r, ihm.restraint.CrossLinkRestraint)]
 trnka.linker = ihm.cross_linkers.dss
