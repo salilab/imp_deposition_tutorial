@@ -21,7 +21,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup conda
       run: |
-        support/tutorial_tools/setup_travis.sh ~/conda ${{ matrix.imp-branch }} ${{ matrix.python-version }}
+        ${GITHUB_WORKSPACE}/support/tutorial_tools/setup_travis.sh ~/conda ${{ matrix.imp-branch }} ${{ matrix.python-version }}
     - name: Test
       run: |
         source ~/conda/bin/activate python${{ matrix.python-version }}
