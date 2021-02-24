@@ -1,4 +1,5 @@
 title: Deposition of IMP models
+depends: [imp_tutorial]
 description: >
     This covers the procedure for depositing integrative modeling
     studies in the PDB-Dev database in mmCIF format.
