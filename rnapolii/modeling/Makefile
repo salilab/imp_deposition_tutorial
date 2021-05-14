@@ -8,6 +8,6 @@ clean:
 	rm -rf html
 
 cleaner:
-	rm -f deposition.ipynb deposition.py deposition.md Doxyfile
+	rm -f deposition.ipynb deposition-colab.ipynb deposition.py deposition.md Doxyfile
 	rm -rf html
 
