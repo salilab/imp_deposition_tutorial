@@ -198,23 +198,23 @@ if '--test' in sys.argv: num_frames=100
 num_mc_steps = 10
 
 # This object defines all components to be sampled as well as the sampling protocol
-mc1=IMP.pmi.macros.ReplicaExchange0(m,
-                                    root_hier=root_hier,
-                                    monte_carlo_sample_objects=dof.get_movers(),
-                                    output_objects=outputobjects,
-                                    monte_carlo_temperature=1.0,
-                                    simulated_annealing=True,
-                                    simulated_annealing_minimum_temperature=1.0,
-                                    simulated_annealing_maximum_temperature=2.5,
-                                    simulated_annealing_minimum_temperature_nframes=200,
-                                    simulated_annealing_maximum_temperature_nframes=20,
-                                    replica_exchange_minimum_temperature=1.0,
-                                    replica_exchange_maximum_temperature=2.5,
-                                    number_of_best_scoring_models=10,
-                                    monte_carlo_steps=num_mc_steps,
-                                    number_of_frames=num_frames,
-                                    global_output_directory="output",
-                                    test_mode=True)
+mc1=IMP.pmi.macros.ReplicaExchange(m,
+                                   root_hier=root_hier,
+                                   monte_carlo_sample_objects=dof.get_movers(),
+                                   output_objects=outputobjects,
+                                   monte_carlo_temperature=1.0,
+                                   simulated_annealing=True,
+                                   simulated_annealing_minimum_temperature=1.0,
+                                   simulated_annealing_maximum_temperature=2.5,
+                                   simulated_annealing_minimum_temperature_nframes=200,
+                                   simulated_annealing_maximum_temperature_nframes=20,
+                                   replica_exchange_minimum_temperature=1.0,
+                                   replica_exchange_maximum_temperature=2.5,
+                                   number_of_best_scoring_models=10,
+                                   monte_carlo_steps=num_mc_steps,
+                                   number_of_frames=num_frames,
+                                   global_output_directory="output",
+                                   test_mode=True)
 
 # Start Sampling
 mc1.execute_macro()
