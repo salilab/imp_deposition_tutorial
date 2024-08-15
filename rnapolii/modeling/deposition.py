@@ -6,6 +6,7 @@
 import IMP.pmi.mmcif
 import ihm
 import ihm.location
+import ihm.reference
 import ihm.model
 
 import IMP
@@ -266,6 +267,11 @@ print(last_step.num_models_end)
 
 # Correct number of output models to account for multiple runs
 last_step.num_models_end = 200000
+
+for subunit, accession in [('Rpb1', 'P04050'),
+                           ('Rpb2', 'P08518')]:
+    ref = ihm.reference.UniProtSequence.from_accession(accession)
+    po.entities[subunit].references.append(ref)
 
 # Get last protocol in the file
 protocol = po.system.orphan_protocols[-1]
