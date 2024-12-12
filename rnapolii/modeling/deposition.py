@@ -340,10 +340,8 @@ with open('rnapolii.cif') as fh:
 print(s.title, s.restraints, s.ensembles, s.state_groups)
 
 try:
-    import urllib.request as urllib2  # python3
-except ImportError:
-    import urllib2  # python2
+import urllib.request
 
-fh = urllib2.urlopen('https://pdb-ihm.org/cif/8zze.cif')
+fh = urllib.request.urlopen('https://pdb-ihm.org/cif/8zze.cif')
 s, = ihm.reader.read(fh)
 print(s.title, s.restraints, s.ensembles, s.state_groups)
